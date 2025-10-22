@@ -1,0 +1,64 @@
+import express from 'express';
+import config from '@/config';
+import cors from 'cors';
+import type { CorsOptions } from 'cors';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import helmet from 'helmet';
+import rateLimit from '@/lib/express_rate_limit';
+import v1Routes from '@/routes/v1';
+const app = express();
+
+const corsOptions: CorsOptions = {
+  origin(requestOrigin, callback) {
+    if (
+      config.NODE_ENV === 'development' ||
+      config.WHITELISTED_ORIGINS.includes(requestOrigin || '')
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS Error: ${requestOrigin} is not allowed`), false);
+      console.log(`CORS Error: ${requestOrigin} is not allowed`);
+    }
+  },
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Middleware to parse JSON requests
+app.use(express.json());
+
+// Enable URL-encoded request body parsing with extended option
+// 'extended: true' allows for rich objects and arrays to be encoded
+// into the URL-encoded format, using the qs library.
+app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser());
+
+// Enable response compression to reduce payload size and improve performance
+app.use(
+  compression({
+    threshold: 1024, // Only compress responses larger than 1KB
+  }),
+);
+
+// use helmet for setting various HTTP headers for app security
+app.use(helmet());
+
+// Apply rate limiting middleware to prevent excessive requests and enhance security
+app.use(rateLimit);
+
+(async () => {
+  try {
+    app.use('/api/v1', v1Routes);
+    app.listen(config.port, () => {
+      console.log(`Server is running on http://localhost:${config.port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    if (config.NODE_ENV === 'development') {
+      process.exit(1);
+    }
+  }
+})();

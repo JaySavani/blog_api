@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import rateLimit from '@/lib/express_rate_limit';
 import v1Routes from '@/routes/v1';
 import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
+import { logger } from '@/lib/winston';
 const app = express();
 
 const corsOptions: CorsOptions = {
@@ -19,7 +20,7 @@ const corsOptions: CorsOptions = {
       callback(null, true);
     } else {
       callback(new Error(`CORS Error: ${requestOrigin} is not allowed`), false);
-      console.log(`CORS Error: ${requestOrigin} is not allowed`);
+      logger.warn(`CORS Error: ${requestOrigin} is not allowed`);
     }
   },
 };
@@ -55,10 +56,10 @@ app.use(rateLimit);
     await connectToDatabase();
     app.use('/api/v1', v1Routes);
     app.listen(config.port, () => {
-      console.log(`Server is running on http://localhost:${config.port}`);
+      logger.info(`Server is running on http://localhost:${config.port}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server:', error);
     if (config.NODE_ENV === 'development') {
       process.exit(1);
     }
@@ -68,10 +69,10 @@ app.use(rateLimit);
 const handleServerShutdown = async () => {
   try {
     await disconnectFromDatabase();
-    console.log('Server shut down successfully.');
+    logger.warn('Server shut down successfully.');
     process.exit(0);
   } catch (error) {
-    console.error('Error during server shutdown:', error);
+    logger.error('Error during server shutdown:', error);
   }
 };
 

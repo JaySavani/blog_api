@@ -9,6 +9,7 @@ const config = {
     .split(',')
     .map((origin) => origin.trim()),
   MONGODB_URI: process.env.MONGODB_URI!,
+  LOG_LEVEL: process.env.LOG_LEVEL || 'info',
 };
 
 export default config;

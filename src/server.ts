@@ -7,6 +7,7 @@ import compression from 'compression';
 import helmet from 'helmet';
 import rateLimit from '@/lib/express_rate_limit';
 import v1Routes from '@/routes/v1';
+import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
 const app = express();
 
 const corsOptions: CorsOptions = {
@@ -51,6 +52,7 @@ app.use(rateLimit);
 
 (async () => {
   try {
+    await connectToDatabase();
     app.use('/api/v1', v1Routes);
     app.listen(config.port, () => {
       console.log(`Server is running on http://localhost:${config.port}`);
@@ -62,3 +64,19 @@ app.use(rateLimit);
     }
   }
 })();
+
+const handleServerShutdown = async () => {
+  try {
+    await disconnectFromDatabase();
+    console.log('Server shut down successfully.');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during server shutdown:', error);
+  }
+};
+
+// Handle termination signals for graceful shutdown
+// 'SIGTERM' is triggered when the process is terminated by kill command or system shutdown
+// 'SIGINT' is triggered when the user interrupts the process (e.g., Ctrl+C in terminal)
+process.on('SIGTERM', handleServerShutdown);
+process.on('SIGINT', handleServerShutdown);

@@ -21,3 +21,17 @@ export const Zregister = z.object({
   }),
 });
 export type Zregister = z.infer<typeof Zregister>['body'];
+
+// Custom JWT pattern check (very basic)
+const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+
+export const ZrefreshToken = z.object({
+  cookies: z.object({
+    refreshToken: z
+      .string('Refresh token is required')
+      .min(1, 'Refresh token is required')
+      .regex(jwtRegex, 'Invalid refresh token'),
+  }),
+});
+
+export type ZrefreshToken = z.infer<typeof ZrefreshToken>['cookies'];

@@ -17,3 +17,11 @@ export const generateRefreshToken = (userId: Types.ObjectId): string => {
     subject: 'refreshToken',
   });
 };
+
+export const verifyAccessToken = (token: string) => {
+  return jwt.verify(token, config.JWT_ACCESS_TOKEN_SECRET as string);
+};
+
+export const verifyRefreshToken = (token: string) => {
+  return jwt.verify(token, config.JWT_REFRESH_TOKEN_SECRET as string);
+};

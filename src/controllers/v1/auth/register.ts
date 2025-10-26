@@ -5,12 +5,32 @@ import type { IUser } from '@/models/user';
 import User from '@/models/user';
 import { genUserName } from '@/utils';
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
+import Token from '@/models/token';
+import config from '@/config';
 
 type UserData = Pick<IUser, 'email' | 'password' | 'role'>;
 
 const register = async (req: Request, res: Response) => {
   const { email, password, role } = req.body as UserData;
+  if (role === 'admin' && !config.WHITELIST_ADMINS_MAILS.includes(email)) {
+    res.status(403).json({
+      code: 'AuthorizationError',
+      message: 'You are not allowed to register as an admin',
+    });
+    logger.warn(`Unauthorized admin registration attempt for email: ${email}`);
+    return;
+  }
   try {
+    const isUserExist = await User.findOne({
+      email,
+    });
+    if (isUserExist) {
+      return res.status(400).json({
+        code: 'UserExists',
+        message: 'User with this email already exists',
+      });
+    }
+
     const username = genUserName();
     const newUser = new User({
       username,
@@ -24,11 +44,12 @@ const register = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+    const token = new Token({
+      userId: newUser._id,
+      token: refreshToken,
     });
+    await token.save();
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -42,9 +63,8 @@ const register = async (req: Request, res: Response) => {
         role: newUser.role,
       },
       accessToken,
-      refreshToken,
     });
-    logger.info('User registered successfully', newUser);
+    logger.info('User registered successfully', newUser.toObject());
   } catch (error) {
     res
       .status(500)

@@ -15,6 +15,7 @@ export interface IUser {
     linkedin?: string;
     youtube?: string;
   };
+  comparePassword(password: string): Promise<boolean>;
 }
 
 const userSchema = new Schema<IUser>(
@@ -103,5 +104,11 @@ userSchema.pre('save', async function (next) {
   }
   next();
 });
+
+userSchema.methods.comparePassword = async function (
+  password: string,
+): Promise<boolean> {
+  return await bcrypt.compare(password, this.password);
+};
 
 export default model<IUser>('User', userSchema);

@@ -15,7 +15,7 @@ const validateResource =
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({
-          success: false,
+          code: 'ValidationError',
           errors: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,

@@ -17,11 +17,11 @@ const logout = async (req: Request, res: Response) => {
       logger.info('User logged out successfully', { userId: req.userId });
     }
   } catch (error) {
-    logger.error('Error during logout', error);
     res.status(500).json({
       code: 'InternalServerError',
       message: 'An unexpected error occurred during logout.',
     });
+    logger.error('Error during logout', error);
   }
 };
 

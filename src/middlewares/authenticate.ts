@@ -36,11 +36,11 @@ export const authenticate = (
         message: 'Invalid access token.',
       });
     }
-    res.status(500).json({
+    logger.error('Error occurred during authentication', error);
+    return res.status(500).json({
       code: 'InternalServerError',
       message: 'An unexpected error occurred during authentication.',
     });
-    logger.error('Error occurred during authentication', error);
   }
 
   // Authentication logic here

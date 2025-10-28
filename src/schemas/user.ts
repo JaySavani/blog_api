@@ -61,3 +61,28 @@ export const ZupdateUser = z.object({
 });
 
 export type ZupdateUser = z.infer<typeof ZupdateUser>['body'];
+
+export const ZgetAllUsers = z.object({
+  query: z.object({
+    limit: z
+      .string()
+      .optional()
+      .transform((val) => (val ? Number(val) : undefined)) 
+      .refine(
+        (val) =>
+          val === undefined || (Number.isInteger(val) && val >= 1 && val <= 50),
+        { message: 'Limit must be between 1 and 50' },
+      ),
+
+    offset: z
+      .string()
+      .optional()
+      .transform((val) => (val ? Number(val) : undefined))
+      .refine(
+        (val) => val === undefined || (Number.isInteger(val) && val >= 0),
+        { message: 'Offset must be a non-negative integer' },
+      ),
+  }),
+});
+
+export type ZgetAllUsers = z.infer<typeof ZgetAllUsers>['query'];

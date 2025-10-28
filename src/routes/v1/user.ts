@@ -5,7 +5,8 @@ import getCurrentUser from '@/controllers/v1/user/getCurrentUser';
 import updateCurrentUser from '@/controllers/v1/user/updateCurrentUser';
 import deleteCurrentUser from '@/controllers/v1/user/deleteCurrentUser';
 import validateResource from '@/middlewares/validateResource';
-import { ZupdateUser } from '@/schemas/user';
+import { ZgetAllUsers, ZupdateUser } from '@/schemas/user';
+import getAllUsers from '@/controllers/v1/user/getAllUsers';
 const router = Router();
 
 router.get(
@@ -28,6 +29,14 @@ router.delete(
   authenticate,
   authorize(['admin', 'user']),
   deleteCurrentUser,
+);
+
+router.get(
+  '/',
+  authenticate,
+  authorize(['admin']),
+  validateResource(ZgetAllUsers),
+  getAllUsers,
 );
 
 export default router;

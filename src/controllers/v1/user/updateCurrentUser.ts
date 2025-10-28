@@ -28,6 +28,29 @@ const updateCurrentUser = async (req: Request, res: Response) => {
   } = req.body ?? {};
 
   try {
+    const isexistingEmail = await User.findOne({
+      email: email?.toLowerCase(),
+      _id: { $ne: userId },
+    }).exec();
+
+    if (isexistingEmail) {
+      return res.status(409).json({
+        code: 'Conflict',
+        message: 'Email is already in use by another account.',
+      });
+    }
+
+    const isexistingUsername = await User.findOne({
+      username: username,
+      _id: { $ne: userId },
+    }).exec();
+    if (isexistingUsername) {
+      return res.status(409).json({
+        code: 'Conflict',
+        message: 'Username is already in use by another account.',
+      });
+    }
+
     const user = await User.findById(userId).select('+password -__v').exec();
 
     if (!user) {
@@ -72,7 +95,6 @@ const updateCurrentUser = async (req: Request, res: Response) => {
     return res.status(500).json({
       code: 'ServerError',
       message: 'Internal Server Error',
-      error,
     });
   }
 };

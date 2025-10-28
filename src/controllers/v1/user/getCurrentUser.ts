@@ -8,10 +8,10 @@ const getCurrentUser = async (req: Request, res: Response) => {
     const user = await User.findById(userId).select('-__v');
     res.status(200).json(user);
   } catch (error) {
-    res
+    logger.error('Error in getCurrentUser controller:', error);
+    return res
       .status(500)
       .json({ code: 'ServerError', message: 'Internal server error' });
-    logger.error('Error in getCurrentUser controller:', error);
   }
 };
 

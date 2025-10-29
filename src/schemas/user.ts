@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { z } from 'zod';
 
 export const ZupdateUser = z.object({
@@ -67,7 +68,7 @@ export const ZgetAllUsers = z.object({
     limit: z
       .string()
       .optional()
-      .transform((val) => (val ? Number(val) : undefined)) 
+      .transform((val) => (val ? Number(val) : undefined))
       .refine(
         (val) =>
           val === undefined || (Number.isInteger(val) && val >= 1 && val <= 50),
@@ -86,3 +87,15 @@ export const ZgetAllUsers = z.object({
 });
 
 export type ZgetAllUsers = z.infer<typeof ZgetAllUsers>['query'];
+
+export const ZgetUser = z.object({
+  params: z.object({
+    userId: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid User ID',
+    }),
+  }),
+});
+export type ZgetUser = z.infer<typeof ZgetUser>['params'];
+
+export const ZdeleteUser = ZgetUser;
+export type ZdeleteUser = z.infer<typeof ZdeleteUser>['params'];

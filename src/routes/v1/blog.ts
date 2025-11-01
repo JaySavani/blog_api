@@ -6,7 +6,8 @@ import { Router } from 'express';
 import multer from 'multer';
 import uploadBlogBanner from '@/middlewares/uploadBlogBanner';
 import validateResource from '@/middlewares/validateResource';
-import { ZcreateBlog } from '@/schemas/blog';
+import { getAllBlog, ZcreateBlog } from '@/schemas/blog';
+import getAllBlogs from '@/controllers/v1/blog/getAllBlogs';
 
 const router = Router();
 const upload = multer();
@@ -19,6 +20,14 @@ router.post(
   validateResource(ZcreateBlog),
   uploadBlogBanner('post'),
   createBlog,
+);
+
+router.get(
+  '/',
+  authenticate,
+  authorize(['admin', 'user']),
+  validateResource(getAllBlog),
+  getAllBlogs,
 );
 
 export default router;

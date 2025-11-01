@@ -18,8 +18,6 @@ const createBlog = async (req: Request, res: Response) => {
     // Clean the content using DOMPurify
     const cleanContent = purify.sanitize(content).trim();
 
-    console.log('Creating blog with content:', cleanContent);
-
     const newBlog = await Blog.create({
       title,
       content: cleanContent,

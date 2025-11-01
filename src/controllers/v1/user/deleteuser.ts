@@ -6,7 +6,6 @@ const deleteUser = async (req: Request, res: Response) => {
   const { userId } = req.params;
   try {
     const user = await User.deleteOne({ _id: userId });
-    console.log(user);
     if (!user.deletedCount) {
       return res.status(404).json({
         code: 'NotFound',

@@ -6,8 +6,7 @@ const logout = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies.refreshToken as string;
     if (refreshToken) {
-      const del = await Token.deleteOne({ token: refreshToken });
-      console.log(del);
+      await Token.deleteOne({ token: refreshToken });
       res.clearCookie('refreshToken', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

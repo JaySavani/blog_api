@@ -70,3 +70,9 @@ export const ZgetBlogsByUser = z.object({
       ),
   }),
 });
+
+export const ZgetBlogBySlug = z.object({
+  params: z.object({
+    slug: z.string().min(1, 'Slug is required'),
+  }),
+});

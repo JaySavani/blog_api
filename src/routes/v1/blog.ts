@@ -6,9 +6,15 @@ import { Router } from 'express';
 import multer from 'multer';
 import uploadBlogBanner from '@/middlewares/uploadBlogBanner';
 import validateResource from '@/middlewares/validateResource';
-import { getAllBlog, ZcreateBlog, ZgetBlogsByUser } from '@/schemas/blog';
+import {
+  getAllBlog,
+  ZcreateBlog,
+  ZgetBlogBySlug,
+  ZgetBlogsByUser,
+} from '@/schemas/blog';
 import getAllBlogs from '@/controllers/v1/blog/getAllBlogs';
 import getBlogsByUser from '@/controllers/v1/blog/getBlogByUserId';
+import getBlogBySlug from '@/controllers/v1/blog/getBlogBySlug';
 
 const router = Router();
 const upload = multer();
@@ -37,6 +43,14 @@ router.get(
   authorize(['admin', 'user']),
   validateResource(ZgetBlogsByUser),
   getBlogsByUser,
+);
+
+router.get(
+  '/:slug',
+  authenticate,
+  authorize(['admin', 'user']),
+  validateResource(ZgetBlogBySlug),
+  getBlogBySlug,
 );
 
 export default router;

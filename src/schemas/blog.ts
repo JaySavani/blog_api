@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { z } from 'zod';
 
 export const ZcreateBlog = z.object({
@@ -20,6 +21,34 @@ export const ZcreateBlog = z.object({
 });
 
 export const getAllBlog = z.object({
+  query: z.object({
+    limit: z
+      .string()
+      .optional()
+      .transform((val) => (val ? Number(val) : undefined))
+      .refine(
+        (val) =>
+          val === undefined || (Number.isInteger(val) && val >= 1 && val <= 50),
+        { message: 'Limit must be between 1 and 50' },
+      ),
+
+    offset: z
+      .string()
+      .optional()
+      .transform((val) => (val ? Number(val) : undefined))
+      .refine(
+        (val) => val === undefined || (Number.isInteger(val) && val >= 0),
+        { message: 'Offset must be a non-negative integer' },
+      ),
+  }),
+});
+
+export const ZgetBlogsByUser = z.object({
+  params: z.object({
+    userId: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid User ID',
+    }),
+  }),
   query: z.object({
     limit: z
       .string()

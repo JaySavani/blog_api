@@ -76,3 +76,23 @@ export const ZgetBlogBySlug = z.object({
     slug: z.string().min(1, 'Slug is required'),
   }),
 });
+
+export const ZupdateBlog = z.object({
+  params: z.object({
+    blogId: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid Blog ID',
+    }),
+  }),
+  body: z.object({
+    title: z
+      .string('title is required')
+      .min(1, 'title is required')
+      .max(180, 'Title must be less than 180 characters')
+      .optional(),
+    content: z
+      .string('content is required')
+      .min(1, 'content is required')
+      .optional(),
+    status: z.enum(['draft', 'published']).optional(),
+  }),
+});

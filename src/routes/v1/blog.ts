@@ -11,10 +11,12 @@ import {
   ZcreateBlog,
   ZgetBlogBySlug,
   ZgetBlogsByUser,
+  ZupdateBlog,
 } from '@/schemas/blog';
 import getAllBlogs from '@/controllers/v1/blog/getAllBlogs';
 import getBlogsByUser from '@/controllers/v1/blog/getBlogByUserId';
 import getBlogBySlug from '@/controllers/v1/blog/getBlogBySlug';
+import updateBlog from '@/controllers/v1/blog/updateBlog';
 
 const router = Router();
 const upload = multer();
@@ -22,7 +24,7 @@ const upload = multer();
 router.post(
   '/',
   authenticate,
-  authorize(['admin', 'user']),
+  authorize(['admin']),
   upload.single('banner_image'),
   validateResource(ZcreateBlog),
   uploadBlogBanner('post'),
@@ -51,6 +53,16 @@ router.get(
   authorize(['admin', 'user']),
   validateResource(ZgetBlogBySlug),
   getBlogBySlug,
+);
+
+router.put(
+  '/:blogId',
+  authenticate,
+  authorize(['admin']),
+  upload.single('banner_image'),
+  validateResource(ZupdateBlog),
+  uploadBlogBanner('put'),
+  updateBlog,
 );
 
 export default router;

@@ -96,3 +96,11 @@ export const ZupdateBlog = z.object({
     status: z.enum(['draft', 'published']).optional(),
   }),
 });
+
+export const ZdeleteBlog = z.object({
+  params: z.object({
+    blogId: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid Blog ID',
+    }),
+  }),
+});

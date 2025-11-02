@@ -9,6 +9,7 @@ import validateResource from '@/middlewares/validateResource';
 import {
   getAllBlog,
   ZcreateBlog,
+  ZdeleteBlog,
   ZgetBlogBySlug,
   ZgetBlogsByUser,
   ZupdateBlog,
@@ -17,6 +18,7 @@ import getAllBlogs from '@/controllers/v1/blog/getAllBlogs';
 import getBlogsByUser from '@/controllers/v1/blog/getBlogByUserId';
 import getBlogBySlug from '@/controllers/v1/blog/getBlogBySlug';
 import updateBlog from '@/controllers/v1/blog/updateBlog';
+import deleteBlog from '@/controllers/v1/blog/deleteBlog';
 
 const router = Router();
 const upload = multer();
@@ -63,6 +65,14 @@ router.put(
   validateResource(ZupdateBlog),
   uploadBlogBanner('put'),
   updateBlog,
+);
+
+router.delete(
+  '/:blogId',
+  authenticate,
+  authorize(['admin']),
+  validateResource(ZdeleteBlog),
+  deleteBlog,
 );
 
 export default router;
